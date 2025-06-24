@@ -17,6 +17,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
       console.log("Login button clicked");
+      console.log("BASE URL:", axios.defaults.baseURL);
+
     try {
       let res;
       if (state === "login") {
