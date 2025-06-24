@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const { setShowUserLogin, user, setUser, navigate, role, setRole } =
     useAppContext();
 
@@ -64,7 +66,7 @@ const Navbar = () => {
           <img src={assest.menu_icon} alt="" />
         </button>
       ) : (
-        <div className="relative group">
+        <div className="relative group" onClick={() => setDropdownOpen(!dropdownOpen)}>
           <p className="flex items-center gap-1 text-primary">
             {` Welcome , ${user.name}`}
             <img
@@ -74,8 +76,8 @@ const Navbar = () => {
             />
           </p>
           <ul
-            className="hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200
-              py-2.5 w-30 rounded-md text-sm z-40"
+            className={`hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200
+              py-2.5 w-30 rounded-md text-sm z-40 ${dropdownOpen ? "block" : "hidden"}`}
           >
             <li
               onClick={() => {
