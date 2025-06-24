@@ -16,9 +16,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      console.log("Login button clicked");
     try {
       let res;
-
       if (state === "login") {
         res = await axios.post("/api/user/login", { email, password });
       } else {
