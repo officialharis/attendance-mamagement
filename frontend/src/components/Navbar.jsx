@@ -66,8 +66,11 @@ const Navbar = () => {
           <img src={assest.menu_icon} alt="" />
         </button>
       ) : (
-        <div className="relative group" onClick={() => setDropdownOpen(!dropdownOpen)}>
-          <p className="flex items-center gap-1 text-primary">
+        <div
+          className="relative"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
+          <p className="flex items-center gap-1 text-primary cursor-pointer">
             {` Welcome , ${user.name}`}
             <img
               src={user.profileImage ? user.profileImage : assest.profile_icon}
@@ -76,19 +79,23 @@ const Navbar = () => {
             />
           </p>
           <ul
-            className={`hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200
-              py-2.5 w-30 rounded-md text-sm z-40 ${dropdownOpen ? "block" : "hidden"}`}
+            className={`absolute top-10 right-0 bg-white shadow border border-gray-200
+    py-2.5 w-30 rounded-md text-sm z-40 ${dropdownOpen ? "block" : "hidden"}`}
           >
             <li
               onClick={() => {
                 navigate("dashboard");
+                setDropdownOpen(false);
               }}
               className="p-1.5 pl-3 hover:bg-primary-dull/10 cursor-pointer"
             >
               Dashboard
             </li>
             <li
-              onClick={logOut}
+              onClick={() => {
+                logOut();
+                setDropdownOpen(false);
+              }}
               className="p-1.5 pl-3 hover:bg-primary-dull/10 cursor-pointer"
             >
               LogOut
