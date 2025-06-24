@@ -13,11 +13,20 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 4000
 
-const allowedOrigin = [
-    'http://localhost:5173',
-]
+// Allow only your frontend domain
+const corsOptions = {
+  origin: 'https://attendance-management-frontend-vsnq.onrender.com',
+  credentials: true, // if you use cookies or auth headers
+};
+
+app.use(cors(corsOptions));
+
+
+// const allowedOrigin = [
+//     'http://localhost:5173',
+// ]
 app.use(express.json())
-app.use(cors({ origin: allowedOrigin, credentials: true }))
+// app.use(cors({ origin: allowedOrigin, credentials: true }))
 
 // Connecting With Database..
 await connectDatabase();
