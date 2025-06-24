@@ -1,0 +1,111 @@
+import React, { useState } from "react";
+import { useAppContext } from "../../context/AppContext";
+import { useEffect } from "react";
+
+const ViewStudents = () => {
+  const { students, navigate, studentUpdated, fetchAllStudents } =
+    useAppContext();
+  const [searchTerm, setSearchTerm] = useState("");
+  // For pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
+  const startIndex = (currentPage - 1) * recordsPerPage;
+
+  // UseEffect That rerender Component after "studentUpdated" chnage if new student added
+  useEffect(() => {
+    fetchAllStudents();
+  }, [studentUpdated]);
+
+  const filteredStudents = students.filter((student) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      student.name.toLowerCase().includes(term) ||
+      student.email.toLowerCase().includes(term) ||
+      student.rollNumber.toLowerCase().includes(term)
+    );
+  });
+
+  const paginatedData = filteredStudents.slice(
+    startIndex,
+    startIndex + recordsPerPage
+  );
+  return (
+    <div className="p-6 w-full">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+        <div className="flex flex-col items-end w-max mb-4">
+          <p className="text-2xl md:text-3xl">Student List</p>
+          <div className="w-16 h-0.5 bg-primary rounded-full"></div>
+        </div>
+        <button
+          onClick={() => navigate("/admin/add-student")}
+          className="px-4 py-2 bg-primary text-white rounded-md shadow hover:bg-primary-dull transition cursor-pointer"
+        >
+          + Add Student
+        </button>
+      </div>
+
+      {students.length === 0 ? (
+        <p className="text-gray-500">No students found.</p>
+      ) : (
+        <div className="w-full overflow-x-auto rounded-lg">
+          <div className="mb-4 w-full md:w-1/2">
+            <input
+              type="text"
+              placeholder="Search by name, email, or roll number"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="py-3 px-4 border-b">#</th>
+                <th className="py-2 px-3 md:py-3 md:px-4 border-b text-sm md:text-base">
+                  Name
+                </th>
+                <th className="py-3 px-4 border-b">Email</th>
+                <th className="py-3 px-4 border-b">Roll Number</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((student, index) => (
+                <tr key={student._id} className="text-center">
+                  <td className="py-2 px-4 border-b">{index + 1}</td>
+                  <td className="py-2 px-4 border-b">{student.name}</td>
+                  <td className="py-2 px-3 border-b break-words max-w-xs">
+                    {student.email}
+                  </td>
+                  <td className="py-2 px-4 border-b">{student.rollNumber}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {/* Controls For Pagination */}
+          <div className="flex justify-center gap-2 mt-4">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="bg-blue-600 text-white px-3 py-1 rounded disabled:bg-gray-400 cursor-pointer"
+            >
+              Prev
+            </button>
+            <span className="px-3 py-1 text-gray-700">Page {currentPage}</span>
+            <button
+              disabled={
+                currentPage * recordsPerPage >= filteredStudents.length
+              }
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="bg-blue-600 text-white px-3 py-1 rounded disabled:bg-gray-400 cursor-pointer"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ViewStudents;

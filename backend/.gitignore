@@ -1,0 +1,17 @@
+# Ignore node modules
+node_modules/
+
+# Ignore environment config
+.env
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# OS junk
+.DS_Store

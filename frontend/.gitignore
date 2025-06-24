@@ -1,0 +1,12 @@
+# Ignore node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Build outputs
+dist/
+build/
+
+# OS junk
+.DS_Store

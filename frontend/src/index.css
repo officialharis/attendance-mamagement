@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&display=swap');
+
+@import "tailwindcss";
+
+* {
+  font-family: "Outfit", sans-serif;
+}
+
+@theme {
+  --color-primary: #3b82f6;
+  /* Bright blue for buttons and highlights */
+  --color-primary-dull: #2563eb;
+  /* Slightly darker for hover effects */
+}
+
+.no-scrollbar::-webkit-scrollbar{
+    display: none;
+}
+
+/* Style for Present dates */
+.present-day.react-calendar__tile {
+  background-color: #bbf7d0; /* Tailwind's bg-green-200 */
+  color: #166534; /* Tailwind's text-green-800 */
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+/* Style for Absent dates */
+.absent-day.react-calendar__tile {
+  background-color: #fecaca; /* Tailwind's bg-red-200 */
+  color: #991b1b; /* Tailwind's text-red-800 */
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.mixed-day.react-calendar__tile {
+  background-color: #fde68a; /* Tailwind yellow-200 */
+  color: #78350f; /* Tailwind yellow-800 */
+  font-weight: bold;
+  border-radius: 6px;
+}
