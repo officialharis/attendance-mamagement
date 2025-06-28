@@ -173,6 +173,10 @@ const Login = () => {
         <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
           {state === "register" ? "Create Account" : "Login"}
         </button>
+        <button 
+        onClick={()=>navigate('/admin')}
+        className="border border-primary text-primary hover:bg-primary hover:text-white transition-all w-full py-2 rounded-md cursor-pointer">Admin Login
+        </button>
       </form>
     </div>
   );
