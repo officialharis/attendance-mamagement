@@ -10,14 +10,15 @@ const Login = () => {
   const [department, setDepartment] = useState("MCA");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   const { setUser, setRole, showUserLogin, setShowUserLogin, navigate, axios } =
     useAppContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-      console.log("Login button clicked");
-      console.log("BASE URL:", axios.defaults.baseURL);
+    console.log("Login button clicked");
+    console.log("BASE URL:", axios.defaults.baseURL);
 
     try {
       let res;
@@ -39,10 +40,10 @@ const Login = () => {
       setUser(user);
       setRole(user.role);
       setShowUserLogin(false);
-      toast.success(res.data.message)
+      toast.success(res.data.message);
       navigate("/"); // redirect after login
     } catch (error) {
-      const errorMessage = error.response?.data?.message 
+      const errorMessage = error.response?.data?.message;
       toast.error(errorMessage);
       console.error("Login/Register Error:", error);
     }
@@ -51,7 +52,7 @@ const Login = () => {
   return (
     <div
       onClick={() => setShowUserLogin(false)}
-      className="fixed inset-0 z-30 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-30 flex flex-col  gap-2 items-center justify-center bg-black/50"
     >
       <form
         onSubmit={handleSubmit}
@@ -173,11 +174,24 @@ const Login = () => {
         <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
           {state === "register" ? "Create Account" : "Login"}
         </button>
-        <button 
-        onClick={()=>navigate('/admin')}
-        className="border border-primary text-primary hover:bg-primary hover:text-white transition-all w-full py-2 rounded-md cursor-pointer">Admin Login
-        </button>
+        <p className="text-sm text-center">
+          Want to as Admin ?{" "}
+          <span
+            onClick={() => setShowAdminLogin(true)}
+            className="text-primary cursor-pointer"
+          >
+            Click Here
+          </span>
+        </p>
       </form>
+      {showAdminLogin && (
+        <button
+          onClick={() => navigate("/admin")}
+          className="border border-black text-white bg-primary hover:bg-primary-dull transition-all w-1/5 py-2 rounded-md cursor-pointer"
+        >
+          Admin Login
+        </button>
+      )}
     </div>
   );
 };
