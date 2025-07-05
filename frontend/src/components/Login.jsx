@@ -175,7 +175,7 @@ const Login = () => {
           {state === "register" ? "Create Account" : "Login"}
         </button>
         <p className="text-sm text-center">
-          Want to as Admin ?{" "}
+          Want to login as Admin ?{" "}
           <span
             onClick={() => setShowAdminLogin(true)}
             className="text-primary cursor-pointer"
