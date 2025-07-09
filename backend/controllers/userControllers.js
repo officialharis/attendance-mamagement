@@ -81,7 +81,10 @@ export const login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: token
+                rollNumber: user.rollNumber,
+                token: token,
+                profileImage: user.profileImage || "",
+                department: user.department
             }
         })
     } catch (error) {
@@ -166,7 +169,7 @@ export const getMe = async (req, res) => {
                     // Conditionally add rollNumber or department based on role
                     ...(user.role === 'student' && { rollNumber: user.rollNumber }),
                     ...(user.role === 'teacher' && { department: user.department }),
-                    profileImage:user.profileImage
+                    profileImage: user.profileImage
                 }
             });
         } else {
