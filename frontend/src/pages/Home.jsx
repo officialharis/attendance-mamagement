@@ -7,7 +7,7 @@ import CTA from "../components/CTA";
 const Home = () => {
 
   return (
-    <div className="mt-10">
+    <div className="mt-3 overflow-y-auto">
       <MainBanner />
       <FeaturesSection />
       <HowItWorksSection/>
