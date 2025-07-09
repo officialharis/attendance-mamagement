@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { assest } from "../../assets/assest";
 import { useAppContext } from "../../context/AppContext";
 import { NavLink, Outlet } from "react-router-dom";
 
 const Dashboard = () => {
   const { user, setUser, navigate, role } = useAppContext();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const logOut = () => {
     toast.success("Logged out successfully!");
     localStorage.removeItem("token");
@@ -64,7 +67,7 @@ const Dashboard = () => {
           )}
         </div>
         {/* Right Outlet (Content Area) */}
-        <div  className="flex-1 overflow-y-auto p-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           <Outlet />
         </div>
       </div>

@@ -1,6 +1,8 @@
 import React from "react";
 import MainBanner from "../components/MainBanner";
 import FeaturesSection from "../components/FeaturesSection ";
+import HowItWorksSection from "../components/HowItWorksSection";
+import CTA from "../components/CTA";
 
 const Home = () => {
 
@@ -8,6 +10,8 @@ const Home = () => {
     <div className="mt-10">
       <MainBanner />
       <FeaturesSection />
+      <HowItWorksSection/>
+      <CTA/>
     </div>
   );
 };

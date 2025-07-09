@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
+import Loading from "../../components/Loading";
 
 const MarkAttendance = () => {
   const { axios, user } = useAppContext();
   const [subjects, setSubjects] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
   const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     subjectId: "",
@@ -61,6 +63,7 @@ const MarkAttendance = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const records = students.map((student) => ({
       studentId: student._id,
       status: attendance[student._id] || "absent",
@@ -85,70 +88,76 @@ const MarkAttendance = () => {
       setStudents([]);
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4 text-center">
-        Mark Attendance
-      </h2>
+    <>
+      {loading && <Loading />}
+      <div className="p-4 max-w-5xl mx-auto">
+        <h2 className="text-2xl font-semibold mb-4 text-center">
+          Mark Attendance
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <select
-            value={form.subjectId}
-            onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
-            className="border px-3 py-2 rounded"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <select
+              value={form.subjectId}
+              onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
+              className="border px-3 py-2 rounded"
+              required
+            >
+              <option value="">Select Subject</option>
+              {subjects.map((subj) => (
+                <option key={subj._id} value={subj._id}>
+                  {subj.name} ({subj.code})
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={form.classroomId}
+              onChange={(e) =>
+                setForm({ ...form, classroomId: e.target.value })
+              }
+              className="border px-3 py-2 rounded"
+              required
+            >
+              <option value="">Select Classroom</option>
+              {classrooms.map((cls) => (
+                <option key={cls._id} value={cls._id}>
+                  {cls.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <input
+            type="date"
+            className="border px-3 py-2 rounded w-full"
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
             required
-          >
-            <option value="">Select Subject</option>
-            {subjects.map((subj) => (
-              <option key={subj._id} value={subj._id}>
-                {subj.name} ({subj.code})
-              </option>
-            ))}
-          </select>
+          />
 
-          <select
-            value={form.classroomId}
-            onChange={(e) => setForm({ ...form, classroomId: e.target.value })}
-            className="border px-3 py-2 rounded"
-            required
-          >
-            <option value="">Select Classroom</option>
-            {classrooms.map((cls) => (
-              <option key={cls._id} value={cls._id}>
-                {cls.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <input
-          type="date"
-          className="border px-3 py-2 rounded w-full"
-          value={form.date}
-          onChange={(e) => setForm({ ...form, date: e.target.value })}
-          required
-        />
-
-        {students.length > 0 ? (
-          <div className="space-y-3">
-            {students.map((student) => (
-              <div
-                key={student._id}
-                className="flex items-center justify-between border p-3 rounded"
-              >
-                <div>
-                  <p className="font-medium">{student.name}</p>
-                  <p className="text-sm text-gray-500">{student.email}</p>
-                </div>
-                <div className="flex flex-wrap gap-3 justify-end">
-                  {["Present", "Absent"].map((status) => (
-                    <label
-                      key={status}
-                      className={`px-4 py-1 rounded-full border text-sm sm:text-base cursor-pointer transition
+          {students.length > 0 ? (
+            <div className="space-y-3">
+              {students.map((student) => (
+                <div
+                  key={student._id}
+                  className="flex items-center justify-between border p-3 rounded"
+                >
+                  <div>
+                    <p className="font-medium">{student.name}</p>
+                    <p className="text-sm text-gray-500">{student.email}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3 justify-end">
+                    {["Present", "Absent"].map((status) => (
+                      <label
+                        key={status}
+                        className={`px-4 py-1 rounded-full border text-sm sm:text-base cursor-pointer transition
         ${
           attendance[student._id] === status
             ? status === "Present"
@@ -156,38 +165,39 @@ const MarkAttendance = () => {
               : "bg-red-100 text-red-700 border-red-500"
             : "bg-white text-gray-700 border-gray-300 hover:shadow-sm"
         }`}
-                    >
-                      <input
-                        type="radio"
-                        name={`attendance-${student._id}`}
-                        value={status}
-                        onChange={() =>
-                          handleAttendanceChange(student._id, status)
-                        }
-                        checked={attendance[student._id] === status}
-                        className="hidden"
-                      />
-                      {status}
-                    </label>
-                  ))}
+                      >
+                        <input
+                          type="radio"
+                          name={`attendance-${student._id}`}
+                          value={status}
+                          onChange={() =>
+                            handleAttendanceChange(student._id, status)
+                          }
+                          checked={attendance[student._id] === status}
+                          className="hidden"
+                        />
+                        {status}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-500">No students found</p>
-        )}
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">No students found</p>
+          )}
 
-        {students.length > 0 && (
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
-          >
-            Submit Attendance
-          </button>
-        )}
-      </form>
-    </div>
+          {students.length > 0 && (
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded cursor-pointer"
+            >
+              Submit Attendance
+            </button>
+          )}
+        </form>
+      </div>
+    </>
   );
 };
 

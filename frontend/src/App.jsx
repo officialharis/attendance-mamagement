@@ -30,7 +30,7 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 function App() {
   const isAdminPath = useLocation().pathname.includes("admin");
   const isDashboardPath = useLocation().pathname.includes("dashboard");
-  const { showUserLogin, isAdmin, role } = useAppContext();
+  const { user,showUserLogin, isAdmin, role ,setShowUserLogin} = useAppContext();
   return (
     <div className="text-default min-h-screen text-gray-700 bg-white">
       {isAdminPath ? null : <Navbar />}
@@ -68,7 +68,7 @@ function App() {
           </Route>
 
           {/* Dashboard For Teacher And Students Routes */}
-          <Route path="/dashboard" element={<Dashboard />}>
+          <Route path="/dashboard" element={user?<Dashboard />:<Home/>}>
             <Route
               index
               element={

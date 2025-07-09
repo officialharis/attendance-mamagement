@@ -33,7 +33,7 @@ const ViewStudents = () => {
     <div className="p-6 w-full">
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
         <div className="flex flex-col items-end w-max mb-4">
-          <p className="text-2xl md:text-3xl">Student List</p>
+          <h2 className="text-2xl font-semibold">Student List</h2>
           <div className="w-16 h-0.5 bg-primary rounded-full"></div>
         </div>
         <button

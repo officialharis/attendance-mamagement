@@ -1,11 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { assest } from "../../assets/assest";
 import toast from "react-hot-toast";
+import Loading from "../../components/Loading";
 
 const StudentProfile = () => {
-  const { user, axios ,setUser} = useAppContext();
+  const { user, axios, setUser } = useAppContext();
   const [editProfile, setEditProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        rollNumber: user.rollNumber || "",
+      });
+      setPreview(user.profileImage || assest.profile_icon);
+    }
+  }, [user]);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -15,14 +27,19 @@ const StudentProfile = () => {
   const [preview, setPreview] = useState(
     user?.profileImage || assest.profile_icon
   );
-  if (!user) {
-    return <p>Loading profile...</p>; // or a loader/spinner
-  }
+  if (!user || !user.name || !user.email || !user.role ) {
+  return (
+    <div className="flex justify-center items-center min-h-[30vh] text-gray-600">
+      <Loading/>
+    </div>
+  );
+}
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-console.log(user)
+  // console.log(user)
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setProfileImage(file);
@@ -31,6 +48,7 @@ console.log(user)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const userToken = localStorage.getItem("token");
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
     try {
@@ -51,6 +69,8 @@ console.log(user)
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
   return (

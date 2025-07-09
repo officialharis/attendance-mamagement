@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import Loading from "./Loading";
 
 const Login = () => {
   const [state, setState] = useState("login");
@@ -11,15 +12,16 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { setUser, setRole, showUserLogin, setShowUserLogin, navigate, axios } =
     useAppContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login button clicked");
-    console.log("BASE URL:", axios.defaults.baseURL);
-
+    // console.log("Login button clicked");
+    // console.log("BASE URL:", axios.defaults.baseURL);
+    setLoading(true);
     try {
       let res;
       if (state === "login") {
@@ -41,158 +43,165 @@ const Login = () => {
       setRole(user.role);
       setShowUserLogin(false);
       toast.success(res.data.message);
-      navigate("/"); // redirect after login
+
+      // Slight delay to ensure context update completes
+      setTimeout(() => navigate("/dashboard"), 200);
     } catch (error) {
       const errorMessage = error.response?.data?.message;
       toast.error(errorMessage);
       console.error("Login/Register Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div
-      onClick={() => setShowUserLogin(false)}
-      className="fixed inset-0 z-30 flex flex-col  gap-2 items-center justify-center bg-black/50"
-    >
-      <form
-        onSubmit={handleSubmit}
-        onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-4 w-80 sm:w-[352px] bg-white p-8 py-12 rounded-lg shadow-xl border border-gray-200"
+    <>
+      {loading && <Loading />}
+      <div
+        onClick={() => setShowUserLogin(false)}
+        className="fixed inset-0 z-30 flex flex-col  gap-2 items-center justify-center bg-black/50"
       >
-        <p className="text-2xl font-medium text-center">
-          <span className="text-primary">User</span>{" "}
-          {state === "login" ? "Login" : "Sign Up"}
-        </p>
+        <form
+          onSubmit={handleSubmit}
+          onClick={(e) => e.stopPropagation()}
+          className="flex flex-col gap-4 w-80 sm:w-[352px] bg-white p-8 py-12 rounded-lg shadow-xl border border-gray-200"
+        >
+          <p className="text-2xl font-medium text-center">
+            <span className="text-primary">User</span>{" "}
+            {state === "login" ? "Login" : "Sign Up"}
+          </p>
 
-        {state === "register" && (
-          <>
-            <div className="w-full">
-              <p>Name</p>
-              <input
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-                placeholder="Type here"
-                className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-                type="text"
-                required
-              />
-            </div>
-
-            <div className="w-full">
-              <p>Role</p>
-              <select
-                className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-                value={formRole}
-                onChange={(e) => setFormRole(e.target.value)}
-              >
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-              </select>
-            </div>
-
-            {formRole === "student" && (
+          {state === "register" && (
+            <>
               <div className="w-full">
-                <p>Roll Number</p>
+                <p>Name</p>
                 <input
-                  onChange={(e) => setRollNumber(e.target.value)}
-                  value={rollNumber}
-                  placeholder="e.g. 21MCA01"
+                  onChange={(e) => setName(e.target.value)}
+                  value={name}
+                  placeholder="Type here"
                   className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
                   type="text"
                   required
                 />
               </div>
-            )}
 
-            {formRole === "teacher" && (
               <div className="w-full">
-                <p>Department</p>
+                <p>Role</p>
                 <select
                   className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  required
+                  value={formRole}
+                  onChange={(e) => setFormRole(e.target.value)}
                 >
-                  <option value="MCA">MCA</option>
-                  <option value="BCA">BCA</option>
-                  <option value="BBA">BBA</option>
-                  <option value="MBA">MBA</option>
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
                 </select>
               </div>
-            )}
-          </>
-        )}
 
-        <div className="w-full">
-          <p>Email</p>
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            placeholder="Type here"
-            className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-            type="email"
-            required
-          />
-        </div>
+              {formRole === "student" && (
+                <div className="w-full">
+                  <p>Roll Number</p>
+                  <input
+                    onChange={(e) => setRollNumber(e.target.value)}
+                    value={rollNumber}
+                    placeholder="e.g. 21MCA01"
+                    className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+                    type="text"
+                    required
+                  />
+                </div>
+              )}
 
-        <div className="w-full">
-          <p>Password</p>
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            placeholder="Type here"
-            className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-            type="password"
-            required
-          />
-        </div>
-
-        <p className="text-sm text-center">
-          {state === "register" ? (
-            <>
-              Already have an account?{" "}
-              <span
-                onClick={() => setState("login")}
-                className="text-primary cursor-pointer"
-              >
-                Login
-              </span>
-            </>
-          ) : (
-            <>
-              Create an account?{" "}
-              <span
-                onClick={() => setState("register")}
-                className="text-primary cursor-pointer"
-              >
-                Register
-              </span>
+              {formRole === "teacher" && (
+                <div className="w-full">
+                  <p>Department</p>
+                  <select
+                    className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    required
+                  >
+                    <option value="MCA">MCA</option>
+                    <option value="BCA">BCA</option>
+                    <option value="BBA">BBA</option>
+                    <option value="MBA">MBA</option>
+                  </select>
+                </div>
+              )}
             </>
           )}
-        </p>
 
-        <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
-          {state === "register" ? "Create Account" : "Login"}
-        </button>
-        <p className="text-sm text-center">
-          Want to login as Admin ?{" "}
-          <span
-            onClick={() => setShowAdminLogin(true)}
-            className="text-primary cursor-pointer"
+          <div className="w-full">
+            <p>Email</p>
+            <input
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              placeholder="Type here"
+              className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+              type="email"
+              required
+            />
+          </div>
+
+          <div className="w-full">
+            <p>Password</p>
+            <input
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              placeholder="Type here"
+              className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+              type="password"
+              required
+            />
+          </div>
+
+          <p className="text-sm text-center">
+            {state === "register" ? (
+              <>
+                Already have an account?{" "}
+                <span
+                  onClick={() => setState("login")}
+                  className="text-primary cursor-pointer"
+                >
+                  Login
+                </span>
+              </>
+            ) : (
+              <>
+                Create an account?{" "}
+                <span
+                  onClick={() => setState("register")}
+                  className="text-primary cursor-pointer"
+                >
+                  Register
+                </span>
+              </>
+            )}
+          </p>
+
+          <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
+            {state === "register" ? "Create Account" : "Login"}
+          </button>
+          <p className="text-sm text-center">
+            Want to login as Admin ?{" "}
+            <span
+              onClick={() => setShowAdminLogin(true)}
+              className="text-primary cursor-pointer"
+            >
+              Click Here
+            </span>
+          </p>
+        </form>
+        {showAdminLogin && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="border border-black text-white bg-primary hover:bg-primary-dull transition-all w-fit px-20 sm:px-0 sm:w-1/5 py-2 rounded-md cursor-pointer"
           >
-            Click Here
-          </span>
-        </p>
-      </form>
-      {showAdminLogin && (
-        <button
-          onClick={() => navigate("/admin")}
-          className="border border-black text-white bg-primary hover:bg-primary-dull transition-all w-1/5 py-2 rounded-md cursor-pointer"
-        >
-          Admin Login
-        </button>
-      )}
-    </div>
+            Admin Login
+          </button>
+        )}
+      </div>
+    </>
   );
 };
 

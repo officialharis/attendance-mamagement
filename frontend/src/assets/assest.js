@@ -16,6 +16,10 @@ import markAttendance from './markAttendance.png'
 import editIcon from './editIcon.png'
 import download from './download.png'
 import dashbaordIcon from './dashbaordIcon.png'
+import instagram from './instagram.png'
+import github from './github.png'
+
+
 
 
 
@@ -38,7 +42,9 @@ export const assest = {
     markAttendance,
     editIcon,
     download,
-    dashbaordIcon
+    dashbaordIcon,
+    instagram,
+    github
 }
 
 export const features = [
