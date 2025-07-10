@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
+import Loading from "../Loading";
 
 const AdminLogin = () => {
-  const { isAdmin, setIsAdmin, navigate ,axios} = useAppContext();
+  const { isAdmin, setIsAdmin, navigate, axios } = useAppContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       // Make API call to backend admin login endpoint
       const res = await axios.post("/api/admin/login", { email, password });
@@ -38,51 +41,56 @@ const AdminLogin = () => {
         "An unexpected error occurred during admin login. Please try again.";
       toast.error(errorMessage); // Show error toast
       console.error("Admin Login Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
-    !isAdmin && (
-      <form
-        onSubmit={onSubmitHandler}
-        className="min-h-screen flex items-center text-sm text-gray-600"
-      >
-        <div
-          className="flex flex-col gap-5 m-auto items-start p-8  py-12 min-w-80 sm:min-w-88
-    rounded-lg shadow-xl border border-gray-200"
+    <>
+      {loading && <Loading />}
+      {!isAdmin && (
+        <form
+          onSubmit={onSubmitHandler}
+          className="min-h-screen flex items-center text-sm text-gray-600"
         >
-          <p className="text-xl font-medium m-auto">
-            <span className="text-primary">Admin</span> Login
-          </p>
+          <div
+            className="flex flex-col gap-5 m-auto items-start p-8  py-12 min-w-80 sm:min-w-88
+    rounded-lg shadow-xl border border-gray-200"
+          >
+            <p className="text-xl font-medium m-auto">
+              <span className="text-primary">Admin</span> Login
+            </p>
 
-          <div className="w-full">
-            <p>Email</p>
-            <input
-              type="email"
-              className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="w-full">
-            <p>Password</p>
-            <input
-              type="password"
-              className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="w-full">
+              <p>Email</p>
+              <input
+                type="email"
+                className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="w-full">
+              <p>Password</p>
+              <input
+                type="password"
+                className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-          <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
-            Login
-          </button>
-        </div>
-      </form>
-    )
+            <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
+              Login
+            </button>
+          </div>
+        </form>
+      )}
+    </>
   );
 };
 

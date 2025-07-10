@@ -50,7 +50,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <div className="md:w-64 w-16 bg-white border-r border-gray-300 pt-4 flex-shrink-0 flex flex-col">
         {(role === "teacher" ? teacherSidebarLinks : studentSidebarLinks).map(
@@ -74,7 +74,7 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 h-screen overflow-y-auto p-4 bg-gray-50">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 bg-gray-50">
         <Outlet />
       </div>
     </div>

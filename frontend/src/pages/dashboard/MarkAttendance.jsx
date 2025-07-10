@@ -96,7 +96,7 @@ const MarkAttendance = () => {
   return (
     <>
       {loading && <Loading />}
-      <div className="p-4 max-w-5xl mx-auto">
+     <div className="p-4 max-w-5xl mx-auto pb-32">
         <h2 className="text-2xl font-semibold mb-4 text-center">
           Mark Attendance
         </h2>
@@ -151,7 +151,7 @@ const MarkAttendance = () => {
                 >
                   <div>
                     <p className="font-medium">{student.name}</p>
-                    <p className="text-sm text-gray-500">{student.email}</p>
+                    <p className="text-sm text-gray-500 break-words max-w-[200px] sm:max-w-xs">{student.email}</p>
                   </div>
                   <div className="flex flex-wrap gap-3 justify-end">
                     {["Present", "Absent"].map((status) => (
