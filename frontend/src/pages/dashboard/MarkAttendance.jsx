@@ -151,7 +151,8 @@ const MarkAttendance = () => {
                 >
                   <div>
                     <p className="font-medium">{student.name}</p>
-                    <p className="text-sm text-gray-500 break-words max-w-[200px] sm:max-w-xs">{student.email}</p>
+                   <p className="text-sm text-gray-500 break-all">{student.email}</p>
+
                   </div>
                   <div className="flex flex-wrap gap-3 justify-end">
                     {["Present", "Absent"].map((status) => (

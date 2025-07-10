@@ -11,6 +11,15 @@ const AttendenceReportTeacher = () => {
   const [toDate, setToDate] = useState("");
   const [filteredData, setFilteredData] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const fetchSubjectAttendence = async () => {
     try {
       const res = await axios.get(`/api/attendance/subject/${subId}`);
@@ -69,7 +78,7 @@ const AttendenceReportTeacher = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-5xl mx-auto pb-32">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Attendance Report</h2>
         <button
@@ -106,14 +115,16 @@ const AttendenceReportTeacher = () => {
           Filter
         </button>
 
-        <button 
-        onClick={()=>{
-          setFromDate("")
-          setToDate("")
-          setFilteredData(subAttendence)
-        }}
-        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-5 cursor-pointer"
-        >Clear Filter</button>
+        <button
+          onClick={() => {
+            setFromDate("");
+            setToDate("");
+            setFilteredData(subAttendence);
+          }}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-5 cursor-pointer"
+        >
+          Clear Filter
+        </button>
       </div>
 
       <div className="overflow-x-auto">
@@ -127,7 +138,7 @@ const AttendenceReportTeacher = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((record) => (
+            {paginatedData.map((record) => (
               <tr key={record._id} className="border-b hover:bg-gray-50">
                 <td className="p-3 border">
                   {new Date(record.date).toLocaleDateString()}
@@ -149,6 +160,33 @@ const AttendenceReportTeacher = () => {
             ))}
           </tbody>
         </table>
+        <div className="mt-6 flex justify-center gap-2 flex-wrap">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-3 py-1 border rounded ${
+                currentPage === i + 1 ? "bg-blue-600 text-white" : ""
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
