@@ -101,6 +101,7 @@ npm run dev
 ## 🌐 Live Demo
 
 <!-- > https://attendance-management-frontend-vsnq.onrender.com -->
+https://attendance-mamagement-frontend.vercel.app/
 
 ---
 
