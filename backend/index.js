@@ -16,7 +16,7 @@ const port = process.env.PORT || 4000
 // Alllowed origin
 const allowedOrigins = [
   "http://localhost:5173", // development
-  "https://attendance-management-frontend-vsnq.onrender.com"  //Production
+  "https://attendance-mamagement-backend.vercel.app"  //Production
 ]
 
 // Allow only your frontend domain

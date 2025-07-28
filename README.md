@@ -100,7 +100,7 @@ npm run dev
 
 ## 🌐 Live Demo
 
-> https://attendance-management-frontend-vsnq.onrender.com
+<!-- > https://attendance-management-frontend-vsnq.onrender.com -->
 
 ---
 
@@ -115,11 +115,7 @@ npm run dev
 
 ## 🙋‍♂️ Author
 
-**Bahauddin Rafiuddin**  
-[GitHub](https://github.com/BahauddinRafiuddin) • [Instagram](https://instagram.com/rafiuddin__01) • [Email](mailto:bahauddinrafiuddin@gmail.com)
+**Harish Dewangan**  
+[GitHub](https://github.com/officialharis) • [Instagram](https://www.instagram.com/_its_harish/) • [Email](mailto:h10dewangan@gmail.com)
 
 ---
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).

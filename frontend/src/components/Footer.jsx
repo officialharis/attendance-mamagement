@@ -36,13 +36,13 @@ const Footer = () => {
           <ul className="space-y-1 text-sm">
             <li className="flex items-center gap-2">
               <img src={assest.github} alt="GitHub" className="w-5 h-5" />
-              <a href="https://github.com/BahauddinRafiuddin" target="_blank" rel="noreferrer" className="hover:text-primary">
+              <a href="https://github.com/officialharis" target="_blank" rel="noreferrer" className="hover:text-primary">
                 GitHub
               </a>
             </li>
             <li className="flex items-center gap-2">
               <img src={assest.instagram} alt="Instagram" className="w-5 h-5" />
-              <a href="https://instagram.com/rafiuddin__01" target="_blank" rel="noreferrer" className="hover:text-primary">
+              <a href="https://www.instagram.com/_its_harish/" target="_blank" rel="noreferrer" className="hover:text-primary">
                 Instagram
               </a>
             </li>
