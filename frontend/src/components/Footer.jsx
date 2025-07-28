@@ -25,7 +25,7 @@ const Footer = () => {
         <div>
           <h4 className="font-semibold mb-2">Contact</h4>
           <ul className="space-y-1 text-sm">
-            <li>Email: <a href="mailto:bahauddinrafiuddin@gmail.com" className="hover:text-primary">bahauddinrafiuddin@gmail.com</a></li>
+            <li>Email: <a href="mailto:h10dewangan@gmail.com" className="hover:text-primary">h10dewangan@gmail.com</a></li>
             <li>Location: India</li>
           </ul>
         </div>

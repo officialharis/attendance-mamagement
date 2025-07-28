@@ -69,8 +69,7 @@ export const adminAuth = async (req, res) => {
                 },
             });
         } else {
-            // This case should ideally be caught by the middleware if the token is invalid or not an admin token.
-            // However, it acts as a safeguard.
+            
             res.status(401).json({ success: false, message: "Not authorized as admin." });
         }
     } catch (error) {
@@ -79,7 +78,6 @@ export const adminAuth = async (req, res) => {
     }
 };
 
-// Admin Add Student /api/admin/add-student
 export const addStudent = async (req, res) => {
     try {
         if (req.user && req.user.role === 'admin') {
@@ -124,7 +122,6 @@ export const addStudent = async (req, res) => {
     }
 }
 
-// Admin Add Teacher /api/admin/add-teacher
 export const addTeacher = async (req, res) => {
     try {
         if (req.user && req.user.role === 'admin') {

@@ -3,8 +3,6 @@ import User from "../models/Users.js"
 
 
 
-// Addng Students In The Classroom Only admin or teacher can add Students In Classroom
-// /api/classroom/add-studenst/:classId
 export const addStudentsToClassroom = async (req, res) => {
     try {
         const { studentIds } = req.body

@@ -14,11 +14,12 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 4000;
 
-// ✅ CORS Fix
+// ✅ CORS Configuration
 const allowedOrigins = [
-  "http://localhost:5173", // ✅ Production domain
-  "https://attendance-mamagement-frontend.vercel.app", // ✅ frontend domain
-  "https://attendance-mamagement-backend.vercel.app"    // ✅ backend domain
+  "http://localhost:5173", // ✅ Frontend development
+  "http://localhost:3000", // ✅ Alternative frontend port
+  "https://attendance-mamagement-frontend.vercel.app", // ✅ Frontend production
+  "https://attendance-mamagement-backend.vercel.app"    // ✅ Backend production
 ];
 
 app.use(
@@ -36,25 +37,92 @@ app.use(
 );
 
 // Middleware
-app.use(express.json());
+// Enhanced JSON parsing with error handling
+app.use(express.json({
+  limit: '10mb',
+  verify: (_, res, buf) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid JSON format in request body"
+      });
+      throw new Error('Invalid JSON');
+    }
+  }
+}));
 
-// Connect to DB and cloud
-await connectDatabase();
-await cloudinaryConnect();
+// URL encoded data parsing
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Test Route
-app.get('/', (req, res) => {
-  res.send("API is Working...");
-});
+// Request logging middleware for debugging
+app.use((req, _, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log('Request body keys:', Object.keys(req.body));
+  }
+  next();
+});;
 
-// API Routes
-app.use('/api/admin', adminRouter);
-app.use('/api/user', userRouter);
-app.use('/api/classroom', classroomRouter);
-app.use('/api/subject', subjectRouter);
-app.use('/api/attendance', attendanceRouter);
+// Startup function with error handling
+const startServer = async () => {
+  try {
+    // Connect to database
+    console.log("🔄 Connecting to database...");
+    await connectDatabase();
 
-// Server listen
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+    // Connect to Cloudinary
+    console.log("🔄 Connecting to Cloudinary...");
+    await cloudinaryConnect();
+
+    // Test Route
+    app.get('/', (_, res) => {
+      res.json({
+        success: true,
+        message: "Attendance Management API is Working!",
+        timestamp: new Date().toISOString(),
+        version: "1.0.0"
+      });
+    });
+
+    // API Routes
+    app.use('/api/admin', adminRouter);
+    app.use('/api/user', userRouter);
+    app.use('/api/classroom', classroomRouter);
+    app.use('/api/subject', subjectRouter);
+    app.use('/api/attendance', attendanceRouter);
+
+    // Error handling middleware
+    app.use((err, req, res, next) => {
+      console.error("Unhandled Error:", err);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    });
+
+    // 404 handler
+    app.use((req, res) => {
+      res.status(404).json({
+        success: false,
+        message: `Route ${req.originalUrl} not found`
+      });
+    });
+
+    // Start server
+    app.listen(port, () => {
+      console.log(`✅ Server is running at http://localhost:${port}`);
+      console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`✅ Database: Connected`);
+      console.log(`✅ Cloudinary: Connected`);
+    });
+
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+// Start the server
+startServer();

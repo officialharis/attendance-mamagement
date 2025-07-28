@@ -50,7 +50,6 @@ export const markStudentAttendance = async (req, res) => {
   }
 }
 
-// Get Attendance Of students By Their id /api/attendance/student/:studentId
 export const getStudentAttendance = async (req, res) => {
   try {
     const { studentId } = req.params
@@ -69,7 +68,6 @@ export const getStudentAttendance = async (req, res) => {
   }
 }
 
-// Get Attendance By Subject /api/attendance/subject/subjectId
 export const getSubjectAttendance = async (req, res) => {
   try {
     const { subjectId } = req.params;
@@ -89,7 +87,6 @@ export const getSubjectAttendance = async (req, res) => {
   }
 };
 
-// get All atendence /api/attendance/all
 export const getAllAttendance = async (req, res) => {
   try {
     if (!req.user || req.user.role !== 'admin') {
@@ -100,7 +97,6 @@ export const getAllAttendance = async (req, res) => {
     let filter = {};
 
     if (date) {
-      // Single date filter
       const selected = new Date(date);
       const nextDay = new Date(selected);
       nextDay.setDate(selected.getDate() + 1);
@@ -108,10 +104,9 @@ export const getAllAttendance = async (req, res) => {
     }
 
     if (from && to) {
-      // Date range filter
       const fromDate = new Date(from);
       const toDate = new Date(to);
-      toDate.setDate(toDate.getDate() + 1); // Include entire last day
+      toDate.setDate(toDate.getDate() + 1); 
       filter.date = { $gte: fromDate, $lt: toDate };
     }
 

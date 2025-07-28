@@ -20,8 +20,37 @@ export const AppContextProvider = ({ children }) => {
   const [subjectUpdated, setSubjectUpdated] = useState(false);
   const [attendance, setAttendance] = useState([]);
 
-  axios.defaults.withCredentials = true; //To send in API Request.
-  axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+  // Configure axios defaults
+  axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+  // Add request interceptor for debugging
+  axios.interceptors.request.use(
+    (config) => {
+      console.log(`Making ${config.method?.toUpperCase()} request to: ${config.url}`);
+      return config;
+    },
+    (error) => {
+      console.error('Request interceptor error:', error);
+      return Promise.reject(error);
+    }
+  );
+
+  // Add response interceptor for error handling
+  axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        // Handle unauthorized access
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminToken');
+        setUser(null);
+        setRole('');
+        setIsAdmin(false);
+      }
+      return Promise.reject(error);
+    }
+  );
 
   // Fetch All Studetns
   const fetchAllStudents = async (params) => {

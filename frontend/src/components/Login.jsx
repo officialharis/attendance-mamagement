@@ -19,37 +19,110 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Login button clicked");
-    // console.log("BASE URL:", axios.defaults.baseURL);
     setLoading(true);
+
     try {
-      let res;
+      // Input validation on frontend
       if (state === "login") {
-        res = await axios.post("/api/user/login", { email, password });
+        if (!email || !password) {
+          toast.error("Please enter both email and password");
+          return;
+        }
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          toast.error("Please enter a valid email address");
+          return;
+        }
       } else {
-        const data = {
-          name,
-          email,
-          password,
-          role: formRole, // use formRole here
-          ...(formRole === "student" ? { rollNumber } : { department }),
-        };
-        res = await axios.post("/api/user/register", data);
+        // Registration validation
+        if (!name || !email || !password) {
+          toast.error("Please fill in all required fields");
+          return;
+        }
+
+        if (formRole === "student" && !rollNumber) {
+          toast.error("Roll number is required for students");
+          return;
+        }
+
+        if (formRole === "teacher" && !department) {
+          toast.error("Department is required for teachers");
+          return;
+        }
       }
 
-      const user = res.data.user;
-      localStorage.setItem("token", user.token);
-      setUser(user);
-      setRole(user.role);
-      setShowUserLogin(false);
-      toast.success(res.data.message);
+      let res;
+      if (state === "login") {
+        // Ensure clean data for login
+        const loginData = {
+          email: email.trim().toLowerCase(),
+          password: password
+        };
 
-      // Slight delay to ensure context update completes
-      setTimeout(() => navigate("/dashboard"), 200);
+        console.log("Sending login request with:", {
+          email: loginData.email,
+          passwordLength: loginData.password.length
+        });
+
+        res = await axios.post("/api/user/login", loginData, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      } else {
+        // Registration data
+        const registrationData = {
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          password: password,
+          role: formRole,
+          ...(formRole === "student" ? { rollNumber: rollNumber.trim() } : { department }),
+        };
+
+        res = await axios.post("/api/user/register", registrationData, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+
+      // Check if response is successful
+      if (res.data && res.data.success) {
+        const user = res.data.user;
+        localStorage.setItem("token", user.token);
+        setUser(user);
+        setRole(user.role);
+        setShowUserLogin(false);
+        toast.success(res.data.message || "Login successful");
+
+        // Slight delay to ensure context update completes
+        setTimeout(() => navigate("/dashboard"), 200);
+      } else {
+        toast.error(res.data?.message || "Login failed");
+      }
+
     } catch (error) {
-      const errorMessage = error.response?.data?.message;
-      toast.error(errorMessage);
-      console.error("Login/Register Error:", error);
+      console.error("Login/Register Error Details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        timestamp: new Date().toISOString()
+      });
+
+      // Handle different types of errors
+      if (error.response) {
+        // Server responded with error status
+        const errorMessage = error.response.data?.message || "Server error occurred";
+        toast.error(errorMessage);
+      } else if (error.request) {
+        // Request was made but no response received
+        toast.error("Unable to connect to server. Please check your internet connection.");
+      } else {
+        // Something else happened
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

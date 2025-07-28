@@ -6,32 +6,100 @@ import { v2 as cloudinary } from 'cloudinary';
 // Register User : /api/user/register
 export const register = async (req, res) => {
     try {
-        const { name, email, password, role, rollNumber, department } = req.body
-        if (!name || !email || !password || !role || (role === "student" && !rollNumber) || (role === "teacher" && !department)) {
-            return res.status(400).json({ success: false, message: "Missing Data" })
+        const { name, email, password, role, rollNumber, department } = req.body;
+
+        // Enhanced input validation
+        if (!req.body) {
+            return res.status(400).json({
+                success: false,
+                message: "Request body is required"
+            });
         }
 
-        // Check Is User Is Already Exist Or Not
-        const existing = await User.findOne({ email })
+        // Check required fields
+        if (!name || !email || !password || !role) {
+            return res.status(400).json({
+                success: false,
+                message: "Name, email, password, and role are required"
+            });
+        }
+
+        // Role-specific validation
+        if (role === "student" && !rollNumber) {
+            return res.status(400).json({
+                success: false,
+                message: "Roll number is required for students"
+            });
+        }
+
+        if (role === "teacher" && !department) {
+            return res.status(400).json({
+                success: false,
+                message: "Department is required for teachers"
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a valid email address"
+            });
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 6 characters long"
+            });
+        }
+
+        // Check if JWT_SECRET is configured
+        if (!process.env.JWT_SECRET) {
+            console.error("JWT_SECRET is not configured in environment variables");
+            return res.status(500).json({
+                success: false,
+                message: "Server configuration error"
+            });
+        }
+
+        // Check if user already exists
+        const existing = await User.findOne({ email: email.toLowerCase().trim() });
         if (existing) {
-            return res.status(400).json({ success: false, message: "User Already Exists" })
+            return res.status(400).json({
+                success: false,
+                message: "User with this email already exists"
+            });
         }
 
-        // Hasing Password
-        const hashedPassword = await bcrypt.hash(password, 10)
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.create({
-            name,
-            email,
+        // Create user object
+        const userData = {
+            name: name.trim(),
+            email: email.toLowerCase().trim(),
             password: hashedPassword,
             role,
-            rollNumber: role === 'student' ? rollNumber : undefined,
-            department,
-        })
+        };
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-            expiresIn: "1d",
-        });
+        // Add role-specific fields
+        if (role === 'student') {
+            userData.rollNumber = rollNumber.trim();
+        } else if (role === 'teacher') {
+            userData.department = department;
+        }
+
+        const user = await User.create(userData);
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
 
         res.status(201).json({
             success: true,
@@ -41,38 +109,128 @@ export const register = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                rollNumber: user.rollNumber || null,
+                department: user.department || null,
                 token: token,
             }
-        })
+        });
+
     } catch (error) {
-        console.error("register Error", error)
-        res.status(500).json({ success: false, message: error.message })
+        console.error("Registration Error Details:", {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+            requestBody: req.body ? {
+                email: req.body.email,
+                role: req.body.role,
+                passwordLength: req.body.password?.length
+            } : null
+        });
+
+        // Handle specific error types
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid input data: " + error.message
+            });
+        }
+
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: "User with this email already exists"
+            });
+        }
+
+        if (error.name === 'MongoError' || error.name === 'MongooseError') {
+            return res.status(500).json({
+                success: false,
+                message: "Database connection error"
+            });
+        }
+
+        // Generic error response
+        res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred during registration. Please try again."
+        });
     }
 }
 
 // Login User : /api/user/login
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body
+        // Enhanced input validation
+        const { email, password } = req.body;
+
+        // Check if request body exists
+        if (!req.body) {
+            return res.status(400).json({
+                success: false,
+                message: "Request body is required"
+            });
+        }
+
+        // Validate email and password presence
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: "Missing email or password" })
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required"
+            });
         }
 
-        // Check Is User Is Already Exist Or Not
-        const user = await User.findOne({ email })
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a valid email address"
+            });
+        }
+
+        // Validate password length
+        if (password.length < 1) {
+            return res.status(400).json({
+                success: false,
+                message: "Password cannot be empty"
+            });
+        }
+
+        // Check if JWT_SECRET is configured
+        if (!process.env.JWT_SECRET) {
+            console.error("JWT_SECRET is not configured in environment variables");
+            return res.status(500).json({
+                success: false,
+                message: "Server configuration error"
+            });
+        }
+
+        // Check if user exists
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
         if (!user) {
-            return res.status(404).json({ success: false, message: "User Does Not Exists" })
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password"
+            });
         }
 
-        // Compare Password With Hashed Password
-        const isPassCorrect = await bcrypt.compare(password, user.password)
+        // Verify password
+        const isPassCorrect = await bcrypt.compare(password, user.password);
         if (!isPassCorrect) {
-            return res.status(401).json({ success: false, message: "Invalid Credentials" })
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password"
+            });
         }
 
-        // Creating JWT Token
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' })
+        // Create JWT token
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
 
+        // Successful login response
         res.status(200).json({
             success: true,
             message: "Login successful",
@@ -81,15 +239,49 @@ export const login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                rollNumber: user.rollNumber,
+                rollNumber: user.rollNumber || null,
                 token: token,
                 profileImage: user.profileImage || "",
-                department: user.department
+                department: user.department || null
             }
-        })
+        });
+
     } catch (error) {
-        console.error("Login Error", error)
-        res.status(500).json({ success: false, message: error.message })
+        // Enhanced error logging
+        console.error("Login Error Details:", {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString(),
+            requestBody: req.body ? { email: req.body.email, passwordLength: req.body.password?.length } : null
+        });
+
+        // Handle specific error types
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid input data"
+            });
+        }
+
+        if (error.name === 'MongoError' || error.name === 'MongooseError') {
+            return res.status(500).json({
+                success: false,
+                message: "Database connection error"
+            });
+        }
+
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(500).json({
+                success: false,
+                message: "Token generation error"
+            });
+        }
+
+        // Generic error response
+        res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred during login. Please try again."
+        });
     }
 }
 
